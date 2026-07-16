@@ -31,7 +31,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'nav.group' => 'Filament Shield',
+    'nav.group' => 'Gerenciamento de Cargos',
     'nav.role.label' => 'Cargos',
     'nav.role.icon' => 'heroicon-o-check-badge',
     'resource.label.role' => 'Cargo',
