@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class UserResource extends Resource
 {
@@ -48,8 +50,12 @@ class UserResource extends Resource
                     ->label('E-mail'),
                     
                 Forms\Components\TextInput::make('telefone')
-                    ->tel()
-                    ->maxLength(20),
+                    ->label('Telefone')
+                    ->mask('(99) 99999-9999')
+                    ->stripCharacters(['(', ')', '-', ' '])
+                    ->minLength(15)
+                    ->maxLength(15)
+                    ->numeric(),
                     
                 Forms\Components\TextInput::make('password')
                     ->password()
@@ -57,15 +63,14 @@ class UserResource extends Resource
                     ->dehydrated(fn ($state) => filled($state))
                     ->label('Senha'),
                     
-                // Aqui entra o Dropdown de Cargos
                 Select::make('roles')
                     ->relationship(
                         name: 'roles', 
                         titleAttribute: 'name',
                         modifyQueryUsing: fn (Builder $query) => $query->whereIn('name', ['Administrador', 'Gestor', 'Colaborador'])
                     )
-                    ->multiple() // Necessário para a relação do Spatie
-                    ->maxItems(1) // Limita a apenas 1 escolha, funcionando como um dropdown único
+                    ->multiple()
+                    ->maxItems(1)
                     ->preload()
                     ->searchable()
                     ->label('Cargo')
@@ -76,6 +81,21 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->filters([
+                SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
+                    ->label('Cargo')
+                    ->preload(),
+                TernaryFilter::make('telefone')
+                    ->label('Possui Telefone?')
+                    ->placeholder('Todos')
+                    ->trueLabel('Sim')
+                    ->falseLabel('Não')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('telefone')->where('telefone', '!=', ''),
+                        false: fn (Builder $query) => $query->whereNull('telefone')->orWhere('telefone', ''),
+                    ),
+                ])
             ->columns([
                 Tables\Columns\ImageColumn::make('avatar')
                     ->label('Foto')
@@ -83,20 +103,36 @@ class UserResource extends Resource
                     ->defaultImageUrl(fn ($record) => filament()->getUserAvatarUrl($record)),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->label('Nome'),
+                    ->label('Nome')
+                    ->sortable(),
                     
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
-                    ->label('E-mail'),
+                    ->label('E-mail')
+                    ->sortable(),
                     
                 Tables\Columns\TextColumn::make('telefone')
                     ->searchable()
-                    ->label('Telefone'),
+                    ->label('Telefone')
+                    ->formatStateUsing(function (?string $state) {
+                        if (! $state) {
+                            return null;
+                        }
+                        $numero = preg_replace('/[^0-9]/', '', $state);
+                        if (strlen($numero) === 11) {
+                            return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $numero);
+                        }
+                        if (strlen($numero) === 10) {
+                            return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $numero);
+                        }
+                        return $state;
+                    })
+                    ->sortable(),
                     
-                // Coluna de Cargos com as cores
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Cargo')
                     ->badge()
+                    ->sortable()
                     ->color(fn (string $state): string => match ($state) {
                         'Administrador' => 'danger',   // Vermelho
                         'Gestor'        => 'warning',  // Amarelo/Laranja
