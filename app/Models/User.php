@@ -3,8 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Filament\Models\Contracts\HasAvatar; // 1. Adicione este import
-use Illuminate\Support\Facades\Storage;  // 2. Adicione este import
+use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Support\Facades\Storage;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'telefone', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements HasAvatar
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
@@ -35,6 +35,6 @@ class User extends Authenticatable
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar ? Storage::url($this->avatar) : null;
+        return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
 }
