@@ -11,7 +11,7 @@
         "filament/filament": "^3.2",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
-        "stechstudio/filament-impersonate": "*"
+        "stechstudio/filament-impersonate": "^3.16"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

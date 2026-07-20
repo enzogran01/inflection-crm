@@ -19,6 +19,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource
 {
@@ -133,13 +134,17 @@ class UserResource extends Resource
                     ->badge()
                     ->sortable()
                     ->color(fn (string $state): string => match ($state) {
-                        'Administrador' => 'danger',   // Vermelho
-                        'Gestor'        => 'warning',  // Amarelo/Laranja
-                        'Colaborador'   => 'success',  // Verde
-                        'super_admin'   => 'primary',  // Azul (para o seu usuário principal)
+                        'Administrador' => 'primary', 
+                        'Gestor'        => 'danger',  
+                        'Colaborador'   => 'success',  
+                        'super_admin'   => 'danger',  
                         default         => 'gray',
                     })
                     ->searchable(),
+            ])
+            ->actions([
+                Impersonate::make()
+                    ->visible(fn () => auth()->user()->hasRole('Administrador'))
             ]);
     }
 
