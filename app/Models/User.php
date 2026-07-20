@@ -38,4 +38,12 @@ class User extends Authenticatable implements HasAvatar
     {
         return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
+
+    /**
+     * As reuniões nas quais este usuário participa diretamente.
+     */
+    public function reunioes(): BelongsToMany
+    {
+        return $this->belongsToMany(Reuniao::class, 'reuniao_user');
+    }
 }
