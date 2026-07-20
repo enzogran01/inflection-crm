@@ -53,9 +53,8 @@ class UserResource extends Resource
                     ->label('Telefone')
                     ->mask('(99) 99999-9999')
                     ->stripCharacters(['(', ')', '-', ' '])
-                    ->minLength(15)
-                    ->maxLength(15)
-                    ->numeric(),
+                    ->numeric() 
+                    ->required(),
                     
                 Forms\Components\TextInput::make('password')
                     ->password()
