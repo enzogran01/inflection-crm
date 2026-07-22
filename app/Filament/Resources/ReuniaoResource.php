@@ -36,8 +36,12 @@ class ReuniaoResource extends Resource
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\DateTimePicker::make('inicio')
+                    ->native(false)
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\DateTimePicker::make('fim')
+                    ->native(false)
+                    ->seconds(false)
                     ->required()
                     ->after('inicio'),
                 Forms\Components\Select::make('status')
@@ -62,6 +66,8 @@ class ReuniaoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
+            ->recordAction('view')
             ->columns([
                 Tables\Columns\TextColumn::make('titulo')
                     ->searchable(),
@@ -98,15 +104,9 @@ class ReuniaoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->slideOver()
-                    ->extraModalFooterActions(fn (\Illuminate\Database\Eloquent\Model $record): array => [
-                        Tables\Actions\EditAction::make()
-                            ->hiddenLabel() // ou tooltip etc, o componente Edit padrão lida bem
-                            ->visible(fn () => auth()->user()->can('update_reuniao', $record)),
-                        Tables\Actions\DeleteAction::make()
-                            ->visible(fn () => auth()->user()->can('delete_reuniao', $record)),
-                    ]),
-                Tables\Actions\EditAction::make()->slideOver(),
+                    ->extraAttributes(['class' => 'hidden']),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

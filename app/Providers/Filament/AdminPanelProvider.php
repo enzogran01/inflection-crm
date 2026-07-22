@@ -56,7 +56,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-                \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
+                \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make()
+                    ->selectable(),
             ])
             ->authMiddleware([
                 Authenticate::class,

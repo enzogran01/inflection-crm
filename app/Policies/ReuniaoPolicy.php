@@ -24,18 +24,7 @@ class ReuniaoPolicy
      */
     public function view(User $user, Reuniao $reuniao): bool
     {
-        if ($user->can('view_reuniao')) {
-            return true;
-        }
-
-        // Verifica se é participante direto
-        if ($reuniao->participantes()->where('users.id', $user->id)->exists()) {
-            return true;
-        }
-
-        // Verifica se o usuário tem algum dos cargos vinculados à reunião
-        // Assumindo que User tem a relação 'roles()' do Spatie
-        return $reuniao->cargos()->whereIn('roles.id', $user->roles()->pluck('id'))->exists();
+        return true;
     }
 
     /**
