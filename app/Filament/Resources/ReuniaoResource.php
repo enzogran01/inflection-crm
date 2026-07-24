@@ -104,7 +104,15 @@ class ReuniaoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->extraAttributes(['class' => 'hidden']),
+                    ->extraAttributes(['class' => 'hidden'])
+                    ->extraModalFooterActions(fn (\Illuminate\Database\Eloquent\Model $record): array => [
+                        Tables\Actions\EditAction::make()
+                            ->cancelParentActions()
+                            ->visible(fn () => auth()->user()->can('update_reuniao', $record)),
+                        Tables\Actions\DeleteAction::make()
+                            ->cancelParentActions()
+                            ->visible(fn () => auth()->user()->can('delete_reuniao', $record)),
+                    ]),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

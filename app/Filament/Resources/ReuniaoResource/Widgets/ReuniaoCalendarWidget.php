@@ -110,6 +110,7 @@ class ReuniaoCalendarWidget extends FullCalendarWidget
     {
         return [
             \Saade\FilamentFullCalendar\Actions\CreateAction::make()
+                ->extraAttributes(['class' => 'hidden'])
                 ->modalHeading('Criar Reunião')
                 ->model(Reuniao::class)
                 ->mountUsing(function (\Filament\Forms\Form $form, array $arguments) {
@@ -135,9 +136,11 @@ class ReuniaoCalendarWidget extends FullCalendarWidget
         return [
             \Saade\FilamentFullCalendar\Actions\EditAction::make()
                 ->modalHeading('Editar Reunião')
+                ->icon('heroicon-m-pencil-square')
                 ->visible(fn (\Illuminate\Database\Eloquent\Model $record) => auth()->user()->can('update_reuniao', $record)),
             \Saade\FilamentFullCalendar\Actions\DeleteAction::make()
                 ->modalHeading('Excluir Reunião')
+                ->icon('heroicon-m-trash')
                 ->visible(fn (\Illuminate\Database\Eloquent\Model $record) => auth()->user()->can('delete_reuniao', $record)),
         ];
     }
@@ -149,10 +152,12 @@ class ReuniaoCalendarWidget extends FullCalendarWidget
             ->extraModalFooterActions(fn (\Illuminate\Database\Eloquent\Model $record): array => [
                 \Saade\FilamentFullCalendar\Actions\EditAction::make()
                     ->modalHeading('Editar Reunião')
+                    ->icon('heroicon-m-pencil-square')
                     ->cancelParentActions()
                     ->visible(fn () => auth()->user()->can('update_reuniao', $record)),
                 \Saade\FilamentFullCalendar\Actions\DeleteAction::make()
                     ->modalHeading('Excluir Reunião')
+                    ->icon('heroicon-m-trash')
                     ->cancelParentActions()
                     ->visible(fn () => auth()->user()->can('delete_reuniao', $record)),
             ]);
