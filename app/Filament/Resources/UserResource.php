@@ -61,6 +61,7 @@ class UserResource extends Resource
                     ->password()
                     ->required(fn (string $context): bool => $context === 'create')
                     ->dehydrated(fn ($state) => filled($state))
+                    ->formatStateUsing(fn () => null)
                     ->label('Senha'),
                     
                 Select::make('roles')
