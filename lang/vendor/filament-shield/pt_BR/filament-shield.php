@@ -31,7 +31,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'nav.group' => 'Gerenciamento de Cargos',
+    'nav.group' => 'Administração',
     'nav.role.label' => 'Cargos',
     'nav.role.icon' => 'heroicon-o-check-badge',
     'resource.label.role' => 'Cargo',
