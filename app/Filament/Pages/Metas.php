@@ -11,4 +11,6 @@ class Metas extends Page
     protected static string $view = 'filament.pages.metas';
     
     protected static ?string $cluster = \App\Filament\Clusters\Tarefas::class;
+
+    protected static \Filament\Pages\SubNavigationPosition $subNavigationPosition = \Filament\Pages\SubNavigationPosition::Top;
 }

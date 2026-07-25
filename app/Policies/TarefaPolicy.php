@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Reuniao;
+use App\Models\Tarefa;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ReuniaoPolicy
+class TarefaPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class ReuniaoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_reuniao');
+        return $user->can('view_any_tarefa');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Reuniao $reuniao): bool
+    public function view(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('view_reuniao');
+        return $user->can('view_tarefa');
     }
 
     /**
@@ -31,23 +31,23 @@ class ReuniaoPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_reuniao');
+        return $user->can('create_tarefa');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Reuniao $reuniao): bool
+    public function update(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('update_reuniao');
+        return $user->can('update_tarefa');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Reuniao $reuniao): bool
+    public function delete(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('delete_reuniao');
+        return $user->can('delete_tarefa');
     }
 
     /**
@@ -55,15 +55,15 @@ class ReuniaoPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_reuniao');
+        return $user->can('delete_any_tarefa');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Reuniao $reuniao): bool
+    public function forceDelete(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('force_delete_reuniao');
+        return $user->can('force_delete_tarefa');
     }
 
     /**
@@ -71,15 +71,15 @@ class ReuniaoPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_reuniao');
+        return $user->can('force_delete_any_tarefa');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Reuniao $reuniao): bool
+    public function restore(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('restore_reuniao');
+        return $user->can('restore_tarefa');
     }
 
     /**
@@ -87,15 +87,15 @@ class ReuniaoPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_reuniao');
+        return $user->can('restore_any_tarefa');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Reuniao $reuniao): bool
+    public function replicate(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('replicate_reuniao');
+        return $user->can('replicate_tarefa');
     }
 
     /**
@@ -103,6 +103,6 @@ class ReuniaoPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_reuniao');
+        return $user->can('reorder_tarefa');
     }
 }
