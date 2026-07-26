@@ -136,7 +136,17 @@ class Kanban extends KanbanBoardPage
             ->color('warning')
             ->modalHeading('Criar Tarefa')
             ->visible(fn () => auth()->user()->can('create_tarefa'))
-            ->form($this->getFormSchema());
+            ->form($this->getFormSchema())
+            ->action(function (array $arguments, array $data, \Filament\Forms\Form $form) {
+                $record = new \App\Models\Tarefa();
+                $record->fill([
+                    ...$data,
+                    'status' => $arguments['column'],
+                ]);
+                $record->save();
+                
+                $form->model($record)->saveRelationships();
+            });
     }
 
     public function editAction(Action $action): Action
@@ -145,6 +155,20 @@ class Kanban extends KanbanBoardPage
             ->modalHeading('Editar Tarefa')
             ->visible(fn () => auth()->user()->can('update_tarefa'))
             ->form($this->getFormSchema())
+            ->action(function (array $arguments, array $data, \Filament\Forms\Form $form) {
+                $record = \App\Models\Tarefa::find($arguments['record']);
+                if ($record) {
+                    $record->fill($data);
+                    $record->save();
+                    
+                    $form->model($record)->saveRelationships();
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('Tarefa atualizada com sucesso')
+                        ->success()
+                        ->send();
+                }
+            })
             ->extraModalFooterActions([
                 \Filament\Actions\Action::make('delete_tarefa')
                     ->label('Excluir')
