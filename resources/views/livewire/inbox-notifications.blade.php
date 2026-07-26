@@ -1,14 +1,15 @@
 <div>
     <x-filament::modal id="notifications-modal" width="lg">
         <x-slot name="trigger">
-            <div class="relative inline-flex mx-4 mt-1">
+            <div class="relative">
                 <x-filament::icon-button
                     icon="heroicon-o-inbox"
                     color="gray"
                     tooltip="Notificações"
+                    class="mx-4"
                 />
                 @if($this->notifications->count() > 0)
-                    <span class="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-red-600 text-[10px] font-bold text-white px-1 border-2 border-white dark:border-gray-900 shadow-sm">
+                    <span class="absolute -top-2 left-3 flex items-center justify-center min-w-[1.25rem] h-5 rounded-full text-xs font-bold text-white px-1" style="background-color: #ef4444;">
                         {{ $this->notifications->count() }}
                     </span>
                 @endif
