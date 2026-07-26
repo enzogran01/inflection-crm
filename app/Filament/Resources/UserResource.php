@@ -137,7 +137,7 @@ class UserResource extends Resource
                     ->sortable()
                     ->color(fn (string $state): string => match ($state) {
                         'Administrador' => 'primary', 
-                        'Gestor'        => 'danger',  
+                        'Gestor'        => 'warning',  
                         'Colaborador'   => 'success',  
                         'super_admin'   => 'danger',  
                         default         => 'gray',
