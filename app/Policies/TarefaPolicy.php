@@ -19,11 +19,34 @@ class TarefaPolicy
     }
 
     /**
+     * Helper para verificar as regras customizadas de acesso da Tarefa.
+     */
+    protected function canAccessTarefa(User $user, Tarefa $tarefa): bool
+    {
+        // 1. Ver tarefas dos outros
+        if ($user->can('view_others_tarefa')) {
+            return true;
+        }
+
+        // 2. Ver tarefas sem responsáveis
+        if ($tarefa->responsaveis()->count() === 0) {
+            return $user->can('view_unassigned_tarefa');
+        }
+
+        // 3. Ver tarefas suas
+        if ($tarefa->responsaveis()->where('users.id', $user->id)->exists()) {
+            return $user->can('view_own_tarefa');
+        }
+
+        return false;
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('view_tarefa');
+        return $user->can('view_tarefa') && $this->canAccessTarefa($user, $tarefa);
     }
 
     /**
@@ -39,7 +62,7 @@ class TarefaPolicy
      */
     public function update(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('update_tarefa');
+        return $user->can('update_tarefa') && $this->canAccessTarefa($user, $tarefa);
     }
 
     /**
@@ -47,7 +70,7 @@ class TarefaPolicy
      */
     public function delete(User $user, Tarefa $tarefa): bool
     {
-        return $user->can('delete_tarefa');
+        return $user->can('delete_tarefa') && $this->canAccessTarefa($user, $tarefa);
     }
 
     /**
@@ -97,6 +120,7 @@ class TarefaPolicy
     {
         return $user->can('replicate_tarefa');
     }
+
 
     /**
      * Determine whether the user can reorder.

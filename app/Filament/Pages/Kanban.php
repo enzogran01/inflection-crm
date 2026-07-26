@@ -26,14 +26,19 @@ class Kanban extends KanbanBoardPage
         $user = auth()->user();
 
         // Check if user is not an admin or gestor
-        if (! $user->hasAnyRole(['super_admin', 'admin', 'administrador', 'Administrador', 'gestor', 'Gestor'])) {
+        if (! $user->can('view_others_tarefa')) {
             $query->where(function ($q) use ($user) {
-                // Tasks where user is responsible
-                $q->whereHas('responsaveis', function ($query) use ($user) {
-                    $query->where('users.id', $user->id);
-                })
-                // OR tasks with no responsaveis
-                ->orDoesntHave('responsaveis');
+                if ($user->can('view_own_tarefa')) {
+                    $q->whereHas('responsaveis', function ($query) use ($user) {
+                        $query->where('users.id', $user->id);
+                    });
+                } else {
+                    $q->where('id', '<', 0); // impossible condition
+                }
+                
+                if ($user->can('view_unassigned_tarefa')) {
+                    $q->orDoesntHave('responsaveis');
+                }
             });
         }
 
@@ -126,6 +131,21 @@ class Kanban extends KanbanBoardPage
         return $action
             ->modalHeading('Editar Tarefa')
             ->visible(fn () => auth()->user()->can('update_tarefa'))
-            ->form($this->getFormSchema());
+            ->form($this->getFormSchema())
+            ->extraModalFooterActions([
+                \Filament\Actions\Action::make('delete_tarefa')
+                    ->label('Excluir')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Excluir Tarefa')
+                    ->modalDescription('Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.')
+                    ->modalSubmitActionLabel('Sim, excluir')
+                    ->action(function (array $arguments) {
+                        if (isset($arguments['record'])) {
+                            \App\Models\Tarefa::find($arguments['record'])?->delete();
+                            redirect(request()->header('Referer') ?? '/admin/tarefas');
+                        }
+                    })
+            ]);
     }
 }
