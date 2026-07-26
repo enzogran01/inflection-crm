@@ -50,9 +50,10 @@ class ReuniaoAtribuidaNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
+            'tipo' => 'reuniao',
             'reuniao_id' => $this->reuniao->id,
             'titulo' => $this->reuniao->titulo,
-            'mensagem' => 'Você foi convidado para a reunião "' . $this->reuniao->titulo . '" no dia ' . $this->reuniao->inicio->format('d/m/Y \à\s H:i'),
+            'mensagem' => '"' . $this->reuniao->titulo . '" no dia ' . $this->reuniao->inicio->format('d/m/Y \à\s H:i'),
         ];
     }
 }

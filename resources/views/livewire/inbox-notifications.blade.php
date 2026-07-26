@@ -32,10 +32,20 @@
                 <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm text-sm border border-gray-200 dark:border-gray-700">
                     <div class="flex flex-col">
                         <p class="font-medium text-gray-900 dark:text-white mb-1">
-                            {{ 'Nova Tarefa' }}
+                            @if(isset($notification->data['tipo']) && $notification->data['tipo'] === 'reuniao')
+                                Você foi convidado para a Reunião
+                            @elseif(isset($notification->data['tipo']) && $notification->data['tipo'] === 'tarefa')
+                                Você foi atribuído à Tarefa
+                            @elseif($notification->type === 'App\Notifications\ReuniaoAtribuidaNotification')
+                                Você foi convidado para a Reunião
+                            @elseif($notification->type === 'App\Notifications\TarefaAtribuidaNotification')
+                                Você foi atribuído à Tarefa
+                            @else
+                                Nova Notificação
+                            @endif
                         </p>
                         <p class="text-gray-600 dark:text-gray-400 mb-3">
-                            {{ $notification->data['mensagem'] ?? 'Você tem uma nova tarefa atribuída.' }}
+                            {{ $notification->data['mensagem'] ?? '' }}
                         </p>
                     </div>    
                     <x-filament::button size="sm" color="primary" wire:click="estouCiente('{{ $notification->id }}')">

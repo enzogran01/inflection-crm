@@ -50,9 +50,10 @@ class TarefaAtribuidaNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
+            'tipo' => 'tarefa',
             'tarefa_id' => $this->tarefa->id,
             'titulo' => $this->tarefa->titulo,
-            'mensagem' => 'Você foi atribuído à tarefa: ' . $this->tarefa->titulo,
+            'mensagem' => $this->tarefa->titulo,
         ];
     }
 }
