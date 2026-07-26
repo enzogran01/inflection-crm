@@ -55,7 +55,20 @@ class ReuniaoResource extends Resource
                 Forms\Components\Select::make('participantes')
                     ->multiple()
                     ->relationship('participantes', 'name')
-                    ->preload(),
+                    ->preload()
+                    ->saveRelationshipsUsing(function (\Filament\Forms\Components\Select $component, $state, $record) {
+                        $oldParticipantes = $record->participantes()->pluck('users.id')->toArray();
+                        $component->getRelationship()->sync($state ?? []);
+                        
+                        // Fetch fresh state after sync
+                        $newParticipantes = $record->fresh()->participantes()->pluck('users.id')->toArray();
+                        
+                        $added = array_diff($newParticipantes, $oldParticipantes);
+                        
+                        foreach ($added as $userId) {
+                            \App\Models\User::find($userId)?->notify(new \App\Notifications\ReuniaoAtribuidaNotification($record));
+                        }
+                    }),
                 Forms\Components\Select::make('cargos')
                     ->multiple()
                     ->relationship('cargos', 'name')

@@ -11,12 +11,14 @@ class ReuniaoAtribuidaNotification extends Notification
 {
     use Queueable;
 
+    public $reuniao;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($reuniao)
     {
-        //
+        $this->reuniao = $reuniao;
     }
 
     /**
@@ -26,7 +28,7 @@ class ReuniaoAtribuidaNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
     /**
@@ -48,7 +50,9 @@ class ReuniaoAtribuidaNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'reuniao_id' => $this->reuniao->id,
+            'titulo' => $this->reuniao->titulo,
+            'mensagem' => 'Você foi convidado para a reunião: ' . $this->reuniao->titulo,
         ];
     }
 }
