@@ -45,7 +45,12 @@
                             @endif
                         </p>
                         <p class="text-gray-600 dark:text-gray-400 mb-3">
-                            {{ $notification->data['mensagem'] ?? '' }}
+                            @php
+                                $mensagem = $notification->data['mensagem'] ?? '';
+                                $mensagem = str_replace('Você foi convidado para a reunião ', '', $mensagem);
+                                $mensagem = str_replace('Você foi atribuído à tarefa: ', '', $mensagem);
+                            @endphp
+                            {{ $mensagem }}
                         </p>
                     </div>    
                     <x-filament::button size="sm" color="primary" wire:click="estouCiente('{{ $notification->id }}')">
