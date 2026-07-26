@@ -16,7 +16,13 @@ class Tarefa extends Model
         'prazo',
         'status',
         'position',
+        'meta_id',
     ];
+
+    public function meta()
+    {
+        return $this->belongsTo(Meta::class);
+    }
 
     public function responsaveis()
     {

@@ -95,6 +95,12 @@ class Kanban extends KanbanBoardPage
                 ->relationship('responsaveis', 'name')
                 ->searchable()
                 ->preload(),
+            Select::make('meta_id')
+                ->label('Meta')
+                ->relationship('meta', 'titulo')
+                ->searchable()
+                ->preload()
+                ->nullable(),
             Select::make('cargos')
                 ->label('Cargos')
                 ->multiple()
