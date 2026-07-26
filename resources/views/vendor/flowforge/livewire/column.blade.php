@@ -3,7 +3,7 @@
 <div
     class="ff-column kanban-column custom-kanban-column">
     <!-- Column Header -->
-    <div class="ff-column__header">
+    <div class="ff-column__header kanban-header-{{ $column['color'] ?? 'default' }}">
         <div class="ff-column__title-container">
             <h3 class="ff-column__title">
                 {{ $column['label'] }}

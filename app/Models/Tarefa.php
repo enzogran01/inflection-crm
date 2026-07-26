@@ -29,6 +29,11 @@ class Tarefa extends Model
         return $this->belongsToMany(User::class, 'tarefa_user', 'tarefa_id', 'user_id')->using(TarefaUser::class);
     }
 
+    public function getNomeResponsavelAttribute(): ?string
+    {
+        return $this->responsaveis->first()?->name;
+    }
+
     public function cargos()
     {
         return $this->belongsToMany(\Spatie\Permission\Models\Role::class, 'cargo_tarefa', 'tarefa_id', 'role_id');

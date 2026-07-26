@@ -21,7 +21,7 @@ class Kanban extends KanbanBoardPage
 
     public function getSubject(): Builder
     {
-        $query = \App\Models\Tarefa::query();
+        $query = \App\Models\Tarefa::query()->with('responsaveis');
 
         $user = auth()->user();
 
@@ -54,12 +54,15 @@ class Kanban extends KanbanBoardPage
             ->priorityField('prioridade')
             ->cardAttributes([
                 'prazo' => 'Prazo',
+                'nome_responsavel' => 'Responsável',
             ])
             ->cardAttributeIcons([
                 'prazo' => 'heroicon-o-calendar',
+                'nome_responsavel' => 'heroicon-o-user',
             ])
             ->cardAttributeColors([
                 'prazo' => 'danger',
+                'nome_responsavel' => 'default',
             ])
             ->columns([
                 'a_fazer' => 'A Fazer',
@@ -68,8 +71,8 @@ class Kanban extends KanbanBoardPage
                 'concluido' => 'Concluído',
             ])
             ->columnColors([
-                'a_fazer' => 'gray',
-                'em_andamento' => 'blue',
+                'a_fazer' => 'danger',
+                'em_andamento' => 'primary',
                 'em_revisao' => 'warning',
                 'concluido' => 'success',
             ]);
