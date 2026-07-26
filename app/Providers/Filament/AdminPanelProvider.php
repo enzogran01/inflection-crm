@@ -62,6 +62,32 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::HEAD_END,
+                fn (): string => '<style>
+                    .fc-daygrid-day-frame { position: relative; }
+                    .fc-daygrid-day-frame::after {
+                        content: "+";
+                        position: absolute;
+                        bottom: 4px;
+                        left: 8px;
+                        font-size: 24px;
+                        font-weight: 500;
+                        color: #9ca3af;
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.2s ease, color 0.2s ease;
+                    }
+                    .fc-daygrid-day-frame:hover::after {
+                        opacity: 1;
+                        color: var(--primary-600, #072ac8);
+                    }
+                </style>'
+            )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => \Illuminate\Support\Facades\Blade::render('@livewire(\'inbox-notifications\')')
+            );
     }
 }

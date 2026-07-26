@@ -99,7 +99,20 @@ class Kanban extends KanbanBoardPage
                 ->multiple()
                 ->relationship('responsaveis', 'name')
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->saveRelationshipsUsing(function (\Filament\Forms\Components\Select $component, $state, $record) {
+                    $oldResponsaveis = $record->responsaveis()->pluck('users.id')->toArray();
+                    $component->getRelationship()->sync($state ?? []);
+                    
+                    // Fetch fresh state after sync
+                    $newResponsaveis = $record->fresh()->responsaveis()->pluck('users.id')->toArray();
+                    
+                    $added = array_diff($newResponsaveis, $oldResponsaveis);
+                    
+                    foreach ($added as $userId) {
+                        \App\Models\User::find($userId)?->notify(new \App\Notifications\TarefaAtribuidaNotification($record));
+                    }
+                }),
             Select::make('meta_id')
                 ->label('Meta')
                 ->relationship('meta', 'titulo')
@@ -140,11 +153,9 @@ class Kanban extends KanbanBoardPage
                     ->modalHeading('Excluir Tarefa')
                     ->modalDescription('Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.')
                     ->modalSubmitActionLabel('Sim, excluir')
-                    ->action(function (array $arguments) {
-                        if (isset($arguments['record'])) {
-                            \App\Models\Tarefa::find($arguments['record'])?->delete();
-                            redirect(request()->header('Referer') ?? '/admin/tarefas');
-                        }
+                    ->action(function (\App\Models\Tarefa $record) {
+                        $record->delete();
+                        redirect(request()->header('Referer') ?? '/admin/tarefas');
                     })
             ]);
     }

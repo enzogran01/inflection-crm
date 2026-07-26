@@ -26,7 +26,7 @@ class Tarefa extends Model
 
     public function responsaveis()
     {
-        return $this->belongsToMany(User::class, 'tarefa_user');
+        return $this->belongsToMany(User::class, 'tarefa_user', 'tarefa_id', 'user_id')->using(TarefaUser::class);
     }
 
     public function cargos()

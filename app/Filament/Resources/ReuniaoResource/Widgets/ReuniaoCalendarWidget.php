@@ -110,7 +110,6 @@ class ReuniaoCalendarWidget extends FullCalendarWidget
     {
         return [
             \Saade\FilamentFullCalendar\Actions\CreateAction::make()
-                ->extraAttributes(['class' => 'hidden'])
                 ->modalHeading('Criar Reunião')
                 ->model(Reuniao::class)
                 ->mountUsing(function (\Filament\Forms\Form $form, array $arguments) {
