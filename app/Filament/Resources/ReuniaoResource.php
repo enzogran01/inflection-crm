@@ -103,18 +103,20 @@ class ReuniaoResource extends Resource
                     ->preload(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->extraAttributes(['class' => 'hidden'])
-                    ->extraModalFooterActions(fn (\Illuminate\Database\Eloquent\Model $record): array => [
-                        Tables\Actions\EditAction::make()
-                            ->cancelParentActions()
-                            ->visible(fn () => auth()->user()->can('update_reuniao', $record)),
-                        Tables\Actions\DeleteAction::make()
-                            ->cancelParentActions()
-                            ->visible(fn () => auth()->user()->can('delete_reuniao', $record)),
-                    ]),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->extraAttributes(['class' => 'hidden'])
+                        ->extraModalFooterActions(fn (\Illuminate\Database\Eloquent\Model $record): array => [
+                            Tables\Actions\EditAction::make()
+                                ->cancelParentActions()
+                                ->visible(fn () => auth()->user()->can('update_reuniao', $record)),
+                            Tables\Actions\DeleteAction::make()
+                                ->cancelParentActions()
+                                ->visible(fn () => auth()->user()->can('delete_reuniao', $record)),
+                        ]),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

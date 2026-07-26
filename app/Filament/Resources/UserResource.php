@@ -145,8 +145,14 @@ class UserResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Impersonate::make()
-                    ->visible(fn () => auth()->user()->hasRole('Administrador'))
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Impersonate::make()
+                        ->label('Personificar')
+                        ->grouped()
+                        ->visible(fn () => auth()->user()->hasRole('Administrador')),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ]);
     }
 
