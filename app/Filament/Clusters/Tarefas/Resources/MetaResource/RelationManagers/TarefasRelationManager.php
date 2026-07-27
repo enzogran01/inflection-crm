@@ -22,6 +22,9 @@ class TarefasRelationManager extends RelationManager
                     ->label('Título')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\RichEditor::make('descricao')
+                    ->label('Descrição')
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('status')
                     ->label('Status')
                     ->options([
@@ -32,10 +35,6 @@ class TarefasRelationManager extends RelationManager
                     ])
                     ->default('a_fazer')
                     ->required(),
-                Forms\Components\DatePicker::make('prazo')
-                    ->label('Prazo')
-                    ->required()
-                    ->displayFormat('d/m/Y'),
                 Forms\Components\Select::make('prioridade')
                     ->label('Prioridade')
                     ->options([
@@ -44,6 +43,33 @@ class TarefasRelationManager extends RelationManager
                         'alta' => 'Alta',
                     ])
                     ->required(),
+                Forms\Components\DatePicker::make('prazo')
+                    ->label('Prazo')
+                    ->displayFormat('d/m/Y'),
+                Forms\Components\Select::make('responsaveis')
+                    ->label('Responsáveis')
+                    ->multiple()
+                    ->relationship('responsaveis', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->saveRelationshipsUsing(function (\Filament\Forms\Components\Select $component, $state, $record) {
+                        $oldResponsaveis = $record->responsaveis()->pluck('users.id')->toArray();
+                        $component->getRelationship()->sync($state ?? []);
+                        
+                        $newResponsaveis = $record->fresh()->responsaveis()->pluck('users.id')->toArray();
+                        
+                        $added = array_diff($newResponsaveis, $oldResponsaveis);
+                        
+                        foreach ($added as $userId) {
+                            \App\Models\User::find($userId)?->notify(new \App\Notifications\TarefaAtribuidaNotification($record));
+                        }
+                    }),
+                Forms\Components\Select::make('cargos')
+                    ->label('Cargos')
+                    ->multiple()
+                    ->relationship('cargos', 'name')
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 
