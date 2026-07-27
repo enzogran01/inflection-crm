@@ -77,6 +77,13 @@ class UserResource extends Resource
                     ->searchable()
                     ->label('Cargo')
                     ->required(),
+                
+                Select::make('area_atuacao_id')
+                    ->relationship('areaAtuacao', 'nome')
+                    ->label('Área de Atuação')
+                    ->preload()
+                    ->searchable()
+                    ->nullable(),
             ]);
     }
 
@@ -142,6 +149,14 @@ class UserResource extends Resource
                         'super_admin'   => 'danger',  
                         default         => 'gray',
                     })
+                    ->searchable(),
+                    
+                Tables\Columns\TextColumn::make('areaAtuacao.nome')
+                    ->label('Área de Atuação')
+                    ->badge()
+                    ->color(fn ($record) => $record->areaAtuacao ? \Filament\Support\Colors\Color::hex($record->areaAtuacao->cor) : 'gray')
+                    ->icon(fn ($record) => $record->areaAtuacao?->icone)
+                    ->sortable()
                     ->searchable(),
             ])
             ->actions([

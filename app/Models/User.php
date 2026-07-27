@@ -25,6 +25,7 @@ class User extends Authenticatable implements HasAvatar
         'password',
         'telefone',
         'avatar',
+        'area_atuacao_id',
     ];
 
     protected $hidden = [
@@ -56,5 +57,10 @@ class User extends Authenticatable implements HasAvatar
     public function reunioes(): BelongsToMany
     {
         return $this->belongsToMany(Reuniao::class, 'reuniao_user');
+    }
+
+    public function areaAtuacao()
+    {
+        return $this->belongsTo(AreaAtuacao::class);
     }
 }

@@ -1,0 +1,1 @@
+<?php $role = Spatie\Permission\Models\Role::where("name", "Administrador")->first(); if($role) { $permissions = Spatie\Permission\Models\Permission::where("name", "like", "%area::atuacao%")->get(); $role->syncPermissions($role->permissions->merge($permissions)); echo "Permissions synced!"; }

@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Tarefa;
+use App\Models\AreaAtuacao;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class TarefaPolicy
+class AreaAtuacaoPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class TarefaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_tarefa');
+        return $user->can('view_any_area::atuacao');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Tarefa $tarefa): bool
+    public function view(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('view_tarefa');
+        return $user->can('view_area::atuacao');
     }
 
     /**
@@ -31,23 +31,23 @@ class TarefaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_tarefa');
+        return $user->can('create_area::atuacao');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Tarefa $tarefa): bool
+    public function update(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('update_tarefa');
+        return $user->can('update_area::atuacao');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Tarefa $tarefa): bool
+    public function delete(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('delete_tarefa');
+        return $user->can('delete_area::atuacao');
     }
 
     /**
@@ -55,15 +55,15 @@ class TarefaPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_tarefa');
+        return $user->can('delete_any_area::atuacao');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Tarefa $tarefa): bool
+    public function forceDelete(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('force_delete_tarefa');
+        return $user->can('force_delete_area::atuacao');
     }
 
     /**
@@ -71,15 +71,15 @@ class TarefaPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_tarefa');
+        return $user->can('force_delete_any_area::atuacao');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Tarefa $tarefa): bool
+    public function restore(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('restore_tarefa');
+        return $user->can('restore_area::atuacao');
     }
 
     /**
@@ -87,15 +87,15 @@ class TarefaPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_tarefa');
+        return $user->can('restore_any_area::atuacao');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Tarefa $tarefa): bool
+    public function replicate(User $user, AreaAtuacao $areaAtuacao): bool
     {
-        return $user->can('replicate_tarefa');
+        return $user->can('replicate_area::atuacao');
     }
 
     /**
@@ -103,6 +103,6 @@ class TarefaPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_tarefa');
+        return $user->can('reorder_area::atuacao');
     }
 }
