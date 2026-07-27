@@ -19,9 +19,32 @@ class Kanban extends KanbanBoardPage
 
     protected static \Filament\Pages\SubNavigationPosition $subNavigationPosition = \Filament\Pages\SubNavigationPosition::Top;
 
+    public ?string $filterSearch = null;
+    public ?string $filterAreaAtuacao = null;
+    public ?string $filterPrioridade = null;
+    public ?string $filterResponsavel = null;
+
     public function getSubject(): Builder
     {
-        $query = \App\Models\Tarefa::query()->with('responsaveis');
+        $query = \App\Models\Tarefa::query()->with(['responsaveis', 'areaAtuacao']);
+
+        if (!empty($this->filterSearch)) {
+            $query->where('titulo', 'like', "%{$this->filterSearch}%");
+        }
+
+        if (!empty($this->filterAreaAtuacao)) {
+            $query->where('area_atuacao_id', $this->filterAreaAtuacao);
+        }
+
+        if (!empty($this->filterPrioridade)) {
+            $query->where('prioridade', $this->filterPrioridade);
+        }
+
+        if (!empty($this->filterResponsavel)) {
+            $query->whereHas('responsaveis', function ($q) {
+                $q->where('users.id', $this->filterResponsavel);
+            });
+        }
 
         $user = auth()->user();
 
@@ -45,7 +68,7 @@ class Kanban extends KanbanBoardPage
         return $query;
     }
 
-    public function mount(): void
+    public function boot(): void
     {
         $this
             ->titleField('titulo')
@@ -55,13 +78,16 @@ class Kanban extends KanbanBoardPage
             ->cardAttributes([
                 'prazo' => 'Prazo',
                 'nome_responsavel' => 'Responsável',
+                'area_atuacao_nome' => 'area_atuacao_nome',
+                'area_atuacao_cor' => 'area_atuacao_cor',
+                'area_atuacao_icone' => 'area_atuacao_icone',
             ])
             ->cardAttributeIcons([
                 'prazo' => 'heroicon-o-calendar',
                 'nome_responsavel' => 'heroicon-o-user',
             ])
             ->cardAttributeColors([
-                'prazo' => 'danger',
+                'prazo' => 'gray',
                 'nome_responsavel' => 'default',
             ])
             ->columns([
@@ -122,12 +148,12 @@ class Kanban extends KanbanBoardPage
                 ->searchable()
                 ->preload()
                 ->nullable(),
-            Select::make('cargos')
-                ->label('Cargos')
-                ->multiple()
-                ->relationship('cargos', 'name')
+            Select::make('area_atuacao_id')
+                ->label('Área de Atuação')
+                ->relationship('areaAtuacao', 'nome')
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->required(),
         ];
     }
 

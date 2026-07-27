@@ -64,12 +64,12 @@ class TarefasRelationManager extends RelationManager
                             \App\Models\User::find($userId)?->notify(new \App\Notifications\TarefaAtribuidaNotification($record));
                         }
                     }),
-                Forms\Components\Select::make('cargos')
-                    ->label('Cargos')
-                    ->multiple()
-                    ->relationship('cargos', 'name')
+                Forms\Components\Select::make('area_atuacao_id')
+                    ->label('Área de Atuação')
+                    ->relationship('areaAtuacao', 'nome')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->required(),
             ]);
     }
 

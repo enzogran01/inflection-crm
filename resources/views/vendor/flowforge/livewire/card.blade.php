@@ -21,9 +21,19 @@
     $responsavelData = $record['attributes']['nome_responsavel'] ?? null;
     $responsavelName = $responsavelData['value'] ?? null;
 
-    // Get remaining attributes (excluding nome_responsavel)
+    // Extract area_atuacao from attributes
+    $areaAtuacaoData = $record['attributes']['area_atuacao_nome'] ?? null;
+    $areaAtuacaoNome = $areaAtuacaoData['value'] ?? null;
+    
+    $areaAtuacaoCorData = $record['attributes']['area_atuacao_cor'] ?? null;
+    $areaAtuacaoCor = $areaAtuacaoCorData['value'] ?? '#6b7280';
+    
+    $areaAtuacaoIconeData = $record['attributes']['area_atuacao_icone'] ?? null;
+    $areaAtuacaoIcone = $areaAtuacaoIconeData['value'] ?? null;
+
+    // Get remaining attributes (excluding nome_responsavel and area_atuacao_*)
     $otherAttributes = collect($record['attributes'] ?? [])
-        ->filter(fn($attr, $key) => $key !== 'nome_responsavel' && !empty($attr['value']));
+        ->filter(fn($attr, $key) => !in_array($key, ['nome_responsavel', 'area_atuacao_nome', 'area_atuacao_cor', 'area_atuacao_icone']) && !empty($attr['value']));
 @endphp
 
 <div
@@ -39,9 +49,19 @@
     @endif
 >
     <div class="ff-card__content">
-        {{-- Title row with priority badge --}}
-        <div class="ff-card__title-row">
-            <h4 class="ff-card__title">{{ $record['title'] }}</h4>
+        {{-- Badges row (Area Atuação + Priority) --}}
+        <div class="ff-card__badges-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+            @if($areaAtuacaoNome)
+                <span class="ff-badge ff-badge--md ff-badge--rounded-md" style="background-color: {{ $areaAtuacaoCor }}20; color: {{ $areaAtuacaoCor }}; border: 1px solid {{ $areaAtuacaoCor }}30; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;">
+                    @if($areaAtuacaoIcone)
+                        <x-dynamic-component :component="$areaAtuacaoIcone" class="w-4 h-4" style="width: 1rem; height: 1rem;" />
+                    @endif
+                    <span class="ff-badge__value" style="font-size: 0.75rem; font-weight: 500;">{{ $areaAtuacaoNome }}</span>
+                </span>
+            @else
+                <div></div>
+            @endif
+
             @if($priorityLabel)
                 <span class="priority-badge {{ $priorityColorClass }}">
                     {{ $priorityLabel }}
@@ -49,11 +69,25 @@
             @endif
         </div>
 
+        {{-- Title row --}}
+        <div class="ff-card__title-row">
+            <h4 class="ff-card__title" style="margin-top: 6px; margin-bottom: 6px; word-wrap: break-word; white-space: normal; font-size: 1rem">{{ $record['title'] }}</h4>
+        </div>
+
         @if(!empty($record['description']))
             <p class="ff-card__description">{{ $record['description'] }}</p>
         @endif
 
-        {{-- Other attributes (like prazo) --}}
+        {{-- Separator + Responsavel --}}
+        <div class="ff-card__separator"></div>
+        @if($responsavelName)
+            <div class="ff-card__responsavel">
+                <x-dynamic-component component="heroicon-o-user" class="ff-card__responsavel-icon" />
+                <span class="ff-card__responsavel-name">{{ $responsavelName }}</span>
+            </div>
+        @endif
+
+        {{-- prazo --}}
         @if($otherAttributes->isNotEmpty())
             <div class="ff-card__attributes">
                 @foreach($otherAttributes as $attribute => $data)
@@ -74,15 +108,6 @@
                         :size="$data['size'] ?? 'md'"
                     />
                 @endforeach
-            </div>
-        @endif
-
-        {{-- Separator + Responsavel --}}
-        @if($responsavelName)
-            <div class="ff-card__separator"></div>
-            <div class="ff-card__responsavel">
-                <x-dynamic-component component="heroicon-o-user" class="ff-card__responsavel-icon" />
-                <span class="ff-card__responsavel-name">{{ $responsavelName }}</span>
             </div>
         @endif
     </div>

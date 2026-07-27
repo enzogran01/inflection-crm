@@ -95,6 +95,10 @@ class UserResource extends Resource
                     ->relationship('roles', 'name')
                     ->label('Cargo')
                     ->preload(),
+                SelectFilter::make('area_atuacao_id')
+                    ->relationship('areaAtuacao', 'nome')
+                    ->label('Área de Atuação')
+                    ->preload(),
                 TernaryFilter::make('telefone')
                     ->label('Possui Telefone?')
                     ->placeholder('Todos')

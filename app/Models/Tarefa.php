@@ -17,11 +17,32 @@ class Tarefa extends Model
         'status',
         'position',
         'meta_id',
+        'area_atuacao_id',
     ];
 
     public function meta()
     {
         return $this->belongsTo(Meta::class);
+    }
+
+    public function areaAtuacao()
+    {
+        return $this->belongsTo(AreaAtuacao::class);
+    }
+
+    public function getAreaAtuacaoNomeAttribute(): ?string
+    {
+        return $this->areaAtuacao?->nome;
+    }
+
+    public function getAreaAtuacaoCorAttribute(): ?string
+    {
+        return $this->areaAtuacao?->cor;
+    }
+
+    public function getAreaAtuacaoIconeAttribute(): ?string
+    {
+        return $this->areaAtuacao?->icone;
     }
 
     public function responsaveis()
