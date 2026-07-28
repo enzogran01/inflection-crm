@@ -25,7 +25,7 @@
         data-column-id="{{ $columnId }}"
         @end.stop="$wire.updateRecordsOrderAndColumn($event.to.getAttribute('data-column-id'), $event.to.sortable.toArray())"
         class="ff-column__content"
-        style="max-height: calc(100vh - 13rem);"
+        style="max-height: calc(100vh - 13rem); min-height: calc(100vh - 13rem);"
     >
         @if (isset($column['items']) && count($column['items']) > 0)
             @foreach ($column['items'] as $record)
