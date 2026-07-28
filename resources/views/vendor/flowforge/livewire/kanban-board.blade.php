@@ -16,14 +16,21 @@
         }
     })">
     <style>
+        .ff-board__columns {
+            display: flex;
+            width: 100%;
+        }
+
         /* Columns */
         .ff-column {
+            flex: 1;
+            min-width: 250px;
             background-color: #f9fafb !important;
             /* gray-50 */
             border: 1px solid #e5e7eb !important;
             /* gray-200 */
             border-radius: 0.5rem;
-            box-shadow: none !important;
+            box-shadow: none !important;        
         }
 
         :is(.dark .ff-column) {
