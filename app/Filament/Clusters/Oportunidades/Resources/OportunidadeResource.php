@@ -112,10 +112,31 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('categoria')
+                    ->options([
+                        'evento' => 'Evento',
+                        'cliente' => 'Cliente',
+                        'parceria' => 'Parceria',
+                    ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'novo' => 'Novo',
+                        'em negociação' => 'Em negociação',
+                        'revisão' => 'Revisão',
+                        'fechado' => 'Fechado',
+                    ]),
+                Tables\Filters\SelectFilter::make('cliente_id')
+                    ->relationship('cliente', 'nome')
+                    ->label('Cliente')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -136,7 +157,6 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
         return [
             'index' => Pages\ListOportunidades::route('/'),
             'create' => Pages\CreateOportunidade::route('/create'),
-            'edit' => Pages\EditOportunidade::route('/{record}/edit'),
         ];
     }
 }

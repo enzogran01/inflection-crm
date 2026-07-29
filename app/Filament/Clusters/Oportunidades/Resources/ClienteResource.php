@@ -67,6 +67,7 @@ class ClienteResource extends Resource implements \BezhanSalleh\FilamentShield\C
                 Tables\Columns\TextColumn::make('inicio_contato')
                     ->date()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('contato')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -79,10 +80,29 @@ class ClienteResource extends Resource implements \BezhanSalleh\FilamentShield\C
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('inicio_contato')
+                    ->form([
+                        Forms\Components\DatePicker::make('inicio_contato_de')->label('Início Contato (De)'),
+                        Forms\Components\DatePicker::make('inicio_contato_ate')->label('Início Contato (Até)'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['inicio_contato_de'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('inicio_contato', '>=', $date),
+                            )
+                            ->when(
+                                $data['inicio_contato_ate'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('inicio_contato', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -103,7 +123,6 @@ class ClienteResource extends Resource implements \BezhanSalleh\FilamentShield\C
         return [
             'index' => Pages\ListClientes::route('/'),
             'create' => Pages\CreateCliente::route('/create'),
-            'edit' => Pages\EditCliente::route('/{record}/edit'),
         ];
     }
 }
