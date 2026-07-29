@@ -30,7 +30,7 @@
         <div class="py-2 flex gap-4 flex-col">
             @forelse($this->notifications as $notification)
                 <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm text-sm border border-gray-200 dark:border-gray-700">
-                    <div class="flex flex-col">
+                    <div class="flex flex-col cursor-pointer hover:opacity-80 transition flex-grow" wire:click="acessar('{{ $notification->id }}', '{{ $notification->data['url'] ?? '#' }}')">
                         <p class="font-medium text-gray-900 dark:text-white mb-1">
                             @if(isset($notification->data['tipo']) && $notification->data['tipo'] === 'reuniao')
                                 Você foi convidado para a Reunião

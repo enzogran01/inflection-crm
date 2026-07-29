@@ -19,6 +19,14 @@ class InboxNotifications extends Component
         }
     }
 
+    public function acessar($notificationId, $url)
+    {
+        $this->estouCiente($notificationId);
+        if ($url && $url !== '#') {
+            return redirect($url);
+        }
+    }
+
     public function limparTodas()
     {
         auth()->user()->unreadNotifications->markAsRead();

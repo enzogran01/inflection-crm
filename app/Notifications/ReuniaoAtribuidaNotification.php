@@ -54,6 +54,7 @@ class ReuniaoAtribuidaNotification extends Notification
             'reuniao_id' => $this->reuniao->id,
             'titulo' => $this->reuniao->titulo,
             'mensagem' => '"' . $this->reuniao->titulo . '" no dia ' . $this->reuniao->inicio->format('d/m/Y \à\s H:i'),
+            'url' => '/reunioes',
         ];
     }
 }

@@ -54,6 +54,7 @@ class TarefaAtribuidaNotification extends Notification
             'tarefa_id' => $this->tarefa->id,
             'titulo' => $this->tarefa->titulo,
             'mensagem' => $this->tarefa->titulo,
+            'url' => '/tarefas',
         ];
     }
 }
