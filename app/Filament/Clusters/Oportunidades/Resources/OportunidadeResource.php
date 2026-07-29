@@ -25,6 +25,8 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
 
     protected static ?string $cluster = Oportunidades::class;
 
+    protected static \Filament\Pages\SubNavigationPosition $subNavigationPosition = \Filament\Pages\SubNavigationPosition::Top;
+
     public static function getPermissionPrefixes(): array
     {
         return [
@@ -51,8 +53,7 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
                 Forms\Components\Select::make('cliente_id')
                     ->relationship('cliente', 'nome')
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->preload(),
                 Forms\Components\RichEditor::make('descricao')
                     ->columnSpanFull(),
                 Forms\Components\Select::make('categoria')
@@ -77,14 +78,26 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('titulo')
+                    ->searchable()
+                    ->sortable()
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('cliente.nome')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('titulo')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('categoria')
+                    ->badge()
+                    ->color('primary')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'novo' => 'gray',
+                        'em negociação' => 'primary',
+                        'revisão' => 'warning',
+                        'fechado' => 'success',
+                        default => 'primary',
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('data_fechamento_esperada')
                     ->date()

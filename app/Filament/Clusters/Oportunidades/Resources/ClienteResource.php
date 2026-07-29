@@ -25,6 +25,8 @@ class ClienteResource extends Resource implements \BezhanSalleh\FilamentShield\C
 
     protected static ?string $cluster = Oportunidades::class;
 
+    protected static \Filament\Pages\SubNavigationPosition $subNavigationPosition = \Filament\Pages\SubNavigationPosition::Top;
+
     public static function getPermissionPrefixes(): array
     {
         return [
