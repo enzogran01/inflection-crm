@@ -105,6 +105,9 @@ class MetaResource extends Resource
                     ]),
                 ])->space(3),
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([

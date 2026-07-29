@@ -79,6 +79,9 @@ class ClienteResource extends Resource implements \BezhanSalleh\FilamentShield\C
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 Tables\Filters\Filter::make('inicio_contato')
                     ->form([

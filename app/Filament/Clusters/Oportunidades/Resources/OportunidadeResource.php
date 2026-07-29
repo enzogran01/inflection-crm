@@ -111,6 +111,9 @@ class OportunidadeResource extends Resource implements \BezhanSalleh\FilamentShi
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 Tables\Filters\SelectFilter::make('categoria')
                     ->options([
