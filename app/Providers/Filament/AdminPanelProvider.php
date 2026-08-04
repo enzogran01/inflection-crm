@@ -62,6 +62,7 @@ class AdminPanelProvider extends PanelProvider
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make()
                     ->selectable(),
             ])
+            ->spa()
             ->authMiddleware([
                 Authenticate::class,
             ])
@@ -84,6 +85,25 @@ class AdminPanelProvider extends PanelProvider
                     .fc-daygrid-day-frame:hover::after {
                         opacity: 1;
                         color: var(--primary-600, #072ac8);
+                    }
+                    
+                    /* Animação fluida de entrada para a página principal */
+                    .fi-main {
+                        animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    }
+                    
+                    @keyframes fadeSlideUp {
+                        from { opacity: 0; transform: translateY(15px); }
+                        to { opacity: 1; transform: none; }
+                    }
+
+                    /* Transições suaves para interações de botões e links */
+                    .fi-btn,
+                    .fi-icon-btn,
+                    .fi-sidebar-item-button,
+                    .fi-ta-row,
+                    .fi-dropdown-list-item {
+                        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                     }
                 </style>'
             )

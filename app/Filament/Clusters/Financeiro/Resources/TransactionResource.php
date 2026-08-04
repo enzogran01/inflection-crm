@@ -54,7 +54,10 @@ class TransactionResource extends Resource
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric()
-                    ->prefix('R$'),
+                    ->prefix('R$')
+                    ->step('0.01')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 100, 2, '.', '') : null)
+                    ->dehydrateStateUsing(fn ($state) => $state ? (int) round((float) $state * 100) : null),
                 Forms\Components\DatePicker::make('due_date')
                     ->required(),
                 Forms\Components\DatePicker::make('paid_at'),
