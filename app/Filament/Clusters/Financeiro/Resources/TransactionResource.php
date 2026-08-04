@@ -22,7 +22,7 @@ class TransactionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Transações';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     protected static ?string $cluster = Financeiro::class;
 
