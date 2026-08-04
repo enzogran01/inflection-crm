@@ -39,6 +39,18 @@ class TransactionResource extends Resource
                         'despesa' => 'Despesa',
                     ])
                     ->required(),
+                Forms\Components\Select::make('category')
+                    ->options([
+                        'Infraestrutura' => 'Infraestrutura',
+                        'Folha de Pagamento' => 'Folha de Pagamento',
+                        'Marketing' => 'Marketing',
+                        'Impostos' => 'Impostos',
+                        'Serviços' => 'Serviços',
+                        'Vendas' => 'Vendas',
+                        'Outros' => 'Outros',
+                    ])
+                    ->searchable()
+                    ->nullable(),
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric()
@@ -71,6 +83,10 @@ class TransactionResource extends Resource
                         default => 'primary',
                     })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                Tables\Columns\TextColumn::make('category')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->money('BRL', 100)
                     ->sortable()
