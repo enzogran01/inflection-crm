@@ -25,6 +25,7 @@ class FinanceiroDashboard extends Dashboard
             \App\Filament\Clusters\Financeiro\Widgets\TransactionExpensesChart::class,
             \App\Filament\Clusters\Financeiro\Widgets\DueSoonTransactionsTable::class,
             \App\Filament\Clusters\Financeiro\Widgets\RecentPaidTransactionsTable::class,
+            \App\Filament\Clusters\Financeiro\Widgets\PendingRecurringTransactionsWidget::class,
         ];
     }
 }
