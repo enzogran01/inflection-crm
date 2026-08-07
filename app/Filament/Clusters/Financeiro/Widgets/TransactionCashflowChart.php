@@ -33,46 +33,49 @@ class TransactionCashflowChart extends ChartWidget
         $labels = [];
         $receitasData = [];
         $despesasData = [];
+        $now = Carbon::now();
 
         if ($activeFilter === 'year') {
             $months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             $labels = $months;
             
+            $receitas = Transaction::where('type', 'receita')
+                ->where('status', 'pago')
+                ->whereYear('paid_at', $now->year)
+                ->get()
+                ->groupBy(fn($t) => Carbon::parse($t->paid_at)->month);
+
+            $despesas = Transaction::where('type', 'despesa')
+                ->where('status', 'pago')
+                ->whereYear('paid_at', $now->year)
+                ->get()
+                ->groupBy(fn($t) => Carbon::parse($t->paid_at)->month);
+
             for ($i = 1; $i <= 12; $i++) {
-                $receitas = Transaction::where('type', 'receita')
-                    ->where('status', 'pago')
-                    ->whereYear('paid_at', Carbon::now()->year)
-                    ->whereMonth('paid_at', $i)
-                    ->sum('amount');
-
-                $despesas = Transaction::where('type', 'despesa')
-                    ->where('status', 'pago')
-                    ->whereYear('paid_at', Carbon::now()->year)
-                    ->whereMonth('paid_at', $i)
-                    ->sum('amount');
-
-                $receitasData[] = $receitas / 100;
-                $despesasData[] = $despesas / 100;
+                $receitasData[] = ($receitas->get($i)?->sum('amount') ?? 0) / 100;
+                $despesasData[] = ($despesas->get($i)?->sum('amount') ?? 0) / 100;
             }
         } else {
-            $daysInMonth = Carbon::now()->daysInMonth;
+            $daysInMonth = $now->daysInMonth;
+
+            $receitas = Transaction::where('type', 'receita')
+                ->where('status', 'pago')
+                ->whereMonth('paid_at', $now->month)
+                ->whereYear('paid_at', $now->year)
+                ->get()
+                ->groupBy(fn($t) => Carbon::parse($t->paid_at)->day);
+
+            $despesas = Transaction::where('type', 'despesa')
+                ->where('status', 'pago')
+                ->whereMonth('paid_at', $now->month)
+                ->whereYear('paid_at', $now->year)
+                ->get()
+                ->groupBy(fn($t) => Carbon::parse($t->paid_at)->day);
 
             for ($i = 1; $i <= $daysInMonth; $i++) {
-                $date = Carbon::now()->setDay($i)->format('Y-m-d');
                 $labels[] = $i;
-
-                $receitas = Transaction::where('type', 'receita')
-                    ->where('status', 'pago')
-                    ->whereDate('paid_at', $date)
-                    ->sum('amount');
-
-                $despesas = Transaction::where('type', 'despesa')
-                    ->where('status', 'pago')
-                    ->whereDate('paid_at', $date)
-                    ->sum('amount');
-
-                $receitasData[] = $receitas / 100;
-                $despesasData[] = $despesas / 100;
+                $receitasData[] = ($receitas->get($i)?->sum('amount') ?? 0) / 100;
+                $despesasData[] = ($despesas->get($i)?->sum('amount') ?? 0) / 100;
             }
         }
 

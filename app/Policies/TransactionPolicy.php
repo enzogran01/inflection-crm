@@ -89,20 +89,4 @@ class TransactionPolicy
     {
         return $user->can('restore_any_transaction');
     }
-
-    /**
-     * Determine whether the user can replicate.
-     */
-    public function replicate(User $user, Transaction $transaction): bool
-    {
-        return $user->can('{{ Replicate }}');
-    }
-
-    /**
-     * Determine whether the user can reorder.
-     */
-    public function reorder(User $user): bool
-    {
-        return $user->can('{{ Reorder }}');
-    }
 }

@@ -20,39 +20,12 @@ class GenerateRecurringTransactions extends Command
         $now = \Carbon\Carbon::now();
         $this->info("Iniciando geração de transações recorrentes para {$now->format('m/Y')}...");
 
-        $recurringTransactions = \App\Models\RecurringTransaction::query()
-            ->whereDoesntHave('transactions', function (\Illuminate\Database\Eloquent\Builder $query) use ($now) {
-                $query->whereMonth('due_date', $now->month)
-                      ->whereYear('due_date', $now->year);
-            })
-            ->where(function ($query) use ($now) {
-                $query->where('periodicity', 'mensal')
-                      ->orWhere(function ($query) use ($now) {
-                          $query->where('periodicity', 'anual')
-                                ->where('due_month', $now->month);
-                      });
-            })
-            ->get();
+        $recurringTransactions = \App\Models\RecurringTransaction::pendingForCurrentMonth()->get();
 
         $count = 0;
 
         foreach ($recurringTransactions as $record) {
-            $dueDate = $now->copy();
-            if ($record->due_day) {
-                $dueDate->setDay(min($record->due_day, $dueDate->daysInMonth));
-            }
-
-            \App\Models\Transaction::create([
-                'description' => $record->description,
-                'type' => $record->type,
-                'category' => $record->category,
-                'amount' => $record->amount,
-                'due_date' => $dueDate,
-                'status' => 'pendente',
-                'payment_method' => $record->payment_method,
-                'recurring_transaction_id' => $record->id,
-            ]);
-
+            $record->generateTransactionForCurrentMonth();
             $count++;
         }
 

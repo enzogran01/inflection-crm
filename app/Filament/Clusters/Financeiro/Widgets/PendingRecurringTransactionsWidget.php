@@ -18,18 +18,7 @@ class PendingRecurringTransactionsWidget extends BaseWidget
     {
         return $table
             ->query(
-                RecurringTransaction::query()
-                    ->whereDoesntHave('transactions', function (Builder $query) {
-                        $query->whereMonth('due_date', Carbon::now()->month)
-                              ->whereYear('due_date', Carbon::now()->year);
-                    })
-                    ->where(function ($query) {
-                        $query->where('periodicity', 'mensal')
-                              ->orWhere(function ($query) {
-                                  $query->where('periodicity', 'anual')
-                                        ->where('due_month', Carbon::now()->month);
-                              });
-                    })
+                RecurringTransaction::pendingForCurrentMonth()
             )
             ->heading('Contas Recorrentes Disponíveis (' . Carbon::now()->translatedFormat('F/Y') . ')')
             ->columns([
@@ -57,21 +46,7 @@ class PendingRecurringTransactionsWidget extends BaseWidget
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
                     ->action(function (RecurringTransaction $record) {
-                        $dueDate = Carbon::now();
-                        if ($record->due_day) {
-                            $dueDate->setDay(min($record->due_day, $dueDate->daysInMonth));
-                        }
-                        
-                        Transaction::create([
-                            'description' => $record->description,
-                            'type' => $record->type,
-                            'category' => $record->category,
-                            'amount' => $record->amount,
-                            'due_date' => $dueDate,
-                            'status' => 'pendente',
-                            'payment_method' => $record->payment_method,
-                            'recurring_transaction_id' => $record->id,
-                        ]);
+                        $record->generateTransactionForCurrentMonth();
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Gerar Transação do Mês')
