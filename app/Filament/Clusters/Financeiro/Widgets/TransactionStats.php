@@ -3,58 +3,127 @@
 namespace App\Filament\Clusters\Financeiro\Widgets;
 
 use App\Models\Transaction;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Widget;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
-class TransactionStats extends BaseWidget
+class TransactionStats extends Widget
 {
-    protected function getStats(): array
+    protected static string $view = 'filament.clusters.financeiro.widgets.transaction-stats';
+
+    protected int | string | array $columnSpan = 'full';
+
+    protected function getViewData(): array
     {
         $hoje = Carbon::today();
+        
         $inicioMes = Carbon::now()->startOfMonth();
         $fimMes = Carbon::now()->endOfMonth();
+        
+        $inicioMesAnterior = Carbon::now()->subMonth()->startOfMonth();
+        $fimMesAnterior = Carbon::now()->subMonth()->endOfMonth();
 
-        // 1. Saldo Atual (Receitas pagas - Despesas pagas)
+        // ---- SALDO ATUAL ----
         $receitasPagas = Transaction::where('type', 'receita')->where('status', 'pago')->sum('amount');
         $despesasPagas = Transaction::where('type', 'despesa')->where('status', 'pago')->sum('amount');
         $saldoAtual = $receitasPagas - $despesasPagas;
 
-        // 2. Receitas a Receber (Mês)
+        // Variação Mês Anterior (Saldo até fim do mês anterior)
+        $receitasPagasMesAnterior = Transaction::where('type', 'receita')
+            ->where('status', 'pago')
+            ->where('due_date', '<=', $fimMesAnterior)
+            ->sum('amount');
+            
+        $despesasPagasMesAnterior = Transaction::where('type', 'despesa')
+            ->where('status', 'pago')
+            ->where('due_date', '<=', $fimMesAnterior)
+            ->sum('amount');
+            
+        $saldoMesAnterior = $receitasPagasMesAnterior - $despesasPagasMesAnterior;
+        $variacaoSaldo = $saldoMesAnterior != 0 ? (($saldoAtual - $saldoMesAnterior) / abs($saldoMesAnterior)) * 100 : 0;
+
+        // ---- RECEITAS ----
         $receitasReceberMes = Transaction::where('type', 'receita')
             ->where('status', 'pendente')
             ->whereBetween('due_date', [$inicioMes, $fimMes])
             ->sum('amount');
+            
+        $receitasPagasMes = Transaction::where('type', 'receita')
+            ->where('status', 'pago')
+            ->whereBetween('due_date', [$inicioMes, $fimMes])
+            ->sum('amount');
+            
+        $receitasTotaisMes = $receitasReceberMes + $receitasPagasMes;
+        $pctReceitaRealizada = $receitasTotaisMes > 0 ? ($receitasPagasMes / $receitasTotaisMes) * 100 : 0;
 
-        // 3. Despesas a Pagar (Mês)
+        // Crescimento MoM (Mês sobre Mês)
+        $receitasTotaisMesAnterior = Transaction::where('type', 'receita')
+            ->whereBetween('due_date', [$inicioMesAnterior, $fimMesAnterior])
+            ->sum('amount');
+        $crescimentoReceita = $receitasTotaisMesAnterior > 0 ? (($receitasTotaisMes - $receitasTotaisMesAnterior) / $receitasTotaisMesAnterior) * 100 : 0;
+
+        // ---- DESPESAS ----
         $despesasPagarMes = Transaction::where('type', 'despesa')
             ->where('status', 'pendente')
             ->whereBetween('due_date', [$inicioMes, $fimMes])
             ->sum('amount');
+            
+        $despesasPagasMes = Transaction::where('type', 'despesa')
+            ->where('status', 'pago')
+            ->whereBetween('due_date', [$inicioMes, $fimMes])
+            ->sum('amount');
+            
+        $despesasTotaisMes = $despesasPagasMes + $despesasPagarMes;
+        $pctDespesaPaga = $despesasTotaisMes > 0 ? ($despesasPagasMes / $despesasTotaisMes) * 100 : 0;
+        
+        $impactoFaturamento = $receitasTotaisMes > 0 ? ($despesasTotaisMes / $receitasTotaisMes) * 100 : 0;
 
-        // 4. Inadimplência / Atrasos
-        $totalAtrasado = Transaction::where('status', 'atrasado')->sum('amount');
+        // ---- ATRASOS ----
+        $atrasosReceita = Transaction::where('type', 'receita')->where('status', 'atrasado')->sum('amount');
+        $atrasosDespesa = Transaction::where('type', 'despesa')->where('status', 'atrasado')->sum('amount');
+        $totalAtrasado = $atrasosReceita + $atrasosDespesa;
+        
+        $pctAtrasoReceita = $totalAtrasado > 0 ? ($atrasosReceita / $totalAtrasado) * 100 : 0;
+        $pctAtrasoDespesa = $totalAtrasado > 0 ? ($atrasosDespesa / $totalAtrasado) * 100 : 0;
+
+        $tempoMedioAtraso = Transaction::where('status', 'atrasado')
+            ->selectRaw('AVG(DATEDIFF(CURRENT_DATE, due_date)) as dias_atraso')
+            ->value('dias_atraso') ?? 0;
+
+        $saldoSemAtrasos = $saldoAtual + $atrasosReceita - $atrasosDespesa;
+
+        // Projeção Fim de Mês (Saldo Atual + Receitas Pendentes - Despesas Pendentes)
+        $projecaoFimMes = $saldoAtual + $receitasReceberMes - $despesasPagarMes;
 
         return [
-            Stat::make('Saldo Atual', 'R$ ' . number_format($saldoAtual / 100, 2, ',', '.'))
-                ->description('Em caixa hoje')
-                ->descriptionIcon('heroicon-m-banknotes')
-                ->color($saldoAtual >= 0 ? 'success' : 'danger'),
-                
-            Stat::make('Receitas a Receber', 'R$ ' . number_format($receitasReceberMes / 100, 2, ',', '.'))
-                ->description('Previsto para este mês')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->color('success'),
-                
-            Stat::make('Despesas a Pagar', 'R$ ' . number_format($despesasPagarMes / 100, 2, ',', '.'))
-                ->description('Previsto para este mês')
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
-                ->color('warning'),
-                
-            Stat::make('Atrasos', 'R$ ' . number_format($totalAtrasado / 100, 2, ',', '.'))
-                ->description('Total vencido e não pago')
-                ->descriptionIcon('heroicon-m-exclamation-triangle')
-                ->color('danger'),
+            'saldo' => [
+                'atual' => $saldoAtual,
+                'projecao_fim_mes' => $projecaoFimMes,
+                'variacao_mom' => $variacaoSaldo,
+            ],
+            'receitas' => [
+                'total_mes' => $receitasTotaisMes,
+                'receber_mes' => $receitasReceberMes,
+                'pagas_mes' => $receitasPagasMes,
+                'pct_realizada' => $pctReceitaRealizada,
+                'crescimento_mom' => $crescimentoReceita,
+            ],
+            'despesas' => [
+                'total_mes' => $despesasTotaisMes,
+                'pagar_mes' => $despesasPagarMes,
+                'pagas_mes' => $despesasPagasMes,
+                'pct_paga' => $pctDespesaPaga,
+                'impacto_faturamento' => $impactoFaturamento,
+            ],
+            'atrasos' => [
+                'total' => $totalAtrasado,
+                'receitas' => $atrasosReceita,
+                'despesas' => $atrasosDespesa,
+                'pct_receitas' => $pctAtrasoReceita,
+                'pct_despesas' => $pctAtrasoDespesa,
+                'tempo_medio' => round((float) $tempoMedioAtraso),
+                'saldo_projetado' => $saldoSemAtrasos,
+            ]
         ];
     }
 }
