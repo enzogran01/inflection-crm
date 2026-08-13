@@ -15,51 +15,55 @@ class TransactionExpensesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $inicioMes = Carbon::now()->startOfMonth();
-        $fimMes = Carbon::now()->endOfMonth();
+        $cacheKey = 'expenses_chart_' . date('Y-m-d');
+        
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(15), function () {
+            $inicioMes = Carbon::now()->startOfMonth();
+            $fimMes = Carbon::now()->endOfMonth();
 
-        $despesasPorCategoria = Transaction::select('category', DB::raw('SUM(amount) as total'))
-            ->where('type', 'despesa')
-            ->whereBetween('due_date', [$inicioMes, $fimMes])
-            ->whereNotNull('category')
-            ->groupBy('category')
-            ->get();
+            $despesasPorCategoria = Transaction::select('category', DB::raw('SUM(amount) as total'))
+                ->where('type', 'despesa')
+                ->whereBetween('due_date', [$inicioMes, $fimMes])
+                ->whereNotNull('category')
+                ->groupBy('category')
+                ->get();
 
-        $labels = [];
-        $data = [];
-        $backgroundColors = [
-            '#ef4444', // red
-            '#f97316', // orange
-            '#f59e0b', // amber
-            '#eab308', // yellow
-            '#84cc16', // lime
-            '#22c55e', // green
-            '#10b981', // emerald
-            '#14b8a6', // teal
-            '#06b6d4', // cyan
-            '#0ea5e9', // sky
-        ];
+            $labels = [];
+            $data = [];
+            $backgroundColors = [
+                '#ef4444', // red
+                '#f97316', // orange
+                '#f59e0b', // amber
+                '#eab308', // yellow
+                '#84cc16', // lime
+                '#22c55e', // green
+                '#10b981', // emerald
+                '#14b8a6', // teal
+                '#06b6d4', // cyan
+                '#0ea5e9', // sky
+            ];
 
-        $colors = [];
-        $i = 0;
+            $colors = [];
+            $i = 0;
 
-        foreach ($despesasPorCategoria as $despesa) {
-            $labels[] = $despesa->category;
-            $data[] = $despesa->total / 100;
-            $colors[] = $backgroundColors[$i % count($backgroundColors)];
-            $i++;
-        }
+            foreach ($despesasPorCategoria as $despesa) {
+                $labels[] = $despesa->category;
+                $data[] = $despesa->total / 100;
+                $colors[] = $backgroundColors[$i % count($backgroundColors)];
+                $i++;
+            }
 
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Despesas',
-                    'data' => $data,
-                    'backgroundColor' => $colors,
+            return [
+                'datasets' => [
+                    [
+                        'label' => 'Despesas',
+                        'data' => $data,
+                        'backgroundColor' => $colors,
+                    ],
                 ],
-            ],
-            'labels' => $labels,
-        ];
+                'labels' => $labels,
+            ];
+        });
     }
 
     protected function getType(): string

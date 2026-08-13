@@ -49,85 +49,89 @@ class TransactionCashflowChart extends ChartWidget implements HasForms
 
     protected function getData(): array
     {
-        $labels = [];
-        $receitasData = [];
-        $despesasData = [];
+        $cacheKey = 'cashflow_chart_' . md5($this->date_range ?? 'default');
+        
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(15), function () {
+            $labels = [];
+            $receitasData = [];
+            $despesasData = [];
 
-        if (empty($this->date_range)) {
-            $startDate = Carbon::now()->startOfMonth();
-            $endDate = Carbon::now()->endOfMonth();
-        } else {
-            $dates = explode(' - ', $this->date_range);
-            if (count($dates) === 2) {
-                $startDate = Carbon::createFromFormat('d/m/Y', $dates[0])->startOfDay();
-                $endDate = Carbon::createFromFormat('d/m/Y', $dates[1])->endOfDay();
-            } else {
+            if (empty($this->date_range)) {
                 $startDate = Carbon::now()->startOfMonth();
                 $endDate = Carbon::now()->endOfMonth();
+            } else {
+                $dates = explode(' - ', $this->date_range);
+                if (count($dates) === 2) {
+                    $startDate = Carbon::createFromFormat('d/m/Y', $dates[0])->startOfDay();
+                    $endDate = Carbon::createFromFormat('d/m/Y', $dates[1])->endOfDay();
+                } else {
+                    $startDate = Carbon::now()->startOfMonth();
+                    $endDate = Carbon::now()->endOfMonth();
+                }
             }
-        }
 
-        $receitas = Transaction::where('type', 'receita')
-            ->where('status', 'pago')
-            ->whereBetween('paid_at', [$startDate, $endDate])
-            ->get();
+            $receitas = Transaction::where('type', 'receita')
+                ->where('status', 'pago')
+                ->whereBetween('paid_at', [$startDate, $endDate])
+                ->get();
 
-        $despesas = Transaction::where('type', 'despesa')
-            ->where('status', 'pago')
-            ->whereBetween('paid_at', [$startDate, $endDate])
-            ->get();
+            $despesas = Transaction::where('type', 'despesa')
+                ->where('status', 'pago')
+                ->whereBetween('paid_at', [$startDate, $endDate])
+                ->get();
 
-        $diffInDays = $startDate->diffInDays($endDate);
+            $diffInDays = $startDate->diffInDays($endDate);
 
-        if ($diffInDays > 60) {
-            $receitas = $receitas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m'));
-            $despesas = $despesas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m'));
+            if ($diffInDays > 60) {
+                $receitas = $receitas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m'));
+                $despesas = $despesas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m'));
 
-            $currentDate = $startDate->copy()->startOfMonth();
-            $endMonth = $endDate->copy()->endOfMonth();
+                $currentDate = $startDate->copy()->startOfMonth();
+                $endMonth = $endDate->copy()->endOfMonth();
 
-            while ($currentDate->lte($endMonth)) {
-                $monthKey = $currentDate->format('Y-m');
-                $labels[] = ucfirst($currentDate->translatedFormat('M/Y'));
-                $receitasData[] = ($receitas->get($monthKey)?->sum('amount') ?? 0) / 100;
-                $despesasData[] = ($despesas->get($monthKey)?->sum('amount') ?? 0) / 100;
-                $currentDate->addMonth();
+                while ($currentDate->lte($endMonth)) {
+                    $monthKey = $currentDate->format('Y-m');
+                    $labels[] = ucfirst($currentDate->translatedFormat('M/Y'));
+                    $receitasData[] = ($receitas->get($monthKey)?->sum('amount') ?? 0) / 100;
+                    $despesasData[] = ($despesas->get($monthKey)?->sum('amount') ?? 0) / 100;
+                    $currentDate->addMonth();
+                }
+            } else {
+                $receitas = $receitas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m-d'));
+                $despesas = $despesas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m-d'));
+
+                $currentDate = $startDate->copy();
+                while ($currentDate->lte($endDate)) {
+                    $dateKey = $currentDate->format('Y-m-d');
+                    $labels[] = $currentDate->format('d/m');
+                    $receitasData[] = ($receitas->get($dateKey)?->sum('amount') ?? 0) / 100;
+                    $despesasData[] = ($despesas->get($dateKey)?->sum('amount') ?? 0) / 100;
+                    $currentDate->addDay();
+                }
             }
-        } else {
-            $receitas = $receitas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m-d'));
-            $despesas = $despesas->groupBy(fn($t) => Carbon::parse($t->paid_at)->format('Y-m-d'));
 
-            $currentDate = $startDate->copy();
-            while ($currentDate->lte($endDate)) {
-                $dateKey = $currentDate->format('Y-m-d');
-                $labels[] = $currentDate->format('d/m');
-                $receitasData[] = ($receitas->get($dateKey)?->sum('amount') ?? 0) / 100;
-                $despesasData[] = ($despesas->get($dateKey)?->sum('amount') ?? 0) / 100;
-                $currentDate->addDay();
-            }
-        }
-
-        return [
-            'datasets' => [
-                [
-                    'label' => 'Entradas',
-                    'data' => $receitasData,
-                    'borderColor' => '#10b981',
-                    'backgroundColor' => 'rgba(16, 185, 129, 0.2)',
-                    'fill' => true,
-                    'tension' => 0.3,
+            return [
+                'datasets' => [
+                    [
+                        'label' => 'Entradas',
+                        'data' => $receitasData,
+                        'borderColor' => '#10b981',
+                        'backgroundColor' => 'rgba(16, 185, 129, 0.2)',
+                        'fill' => true,
+                        'tension' => 0.3,
+                    ],
+                    [
+                        'label' => 'Saídas',
+                        'data' => $despesasData,
+                        'borderColor' => '#ef4444',
+                        'backgroundColor' => 'rgba(239, 68, 68, 0.2)',
+                        'fill' => true,
+                        'tension' => 0.3,
+                    ],
                 ],
-                [
-                    'label' => 'Saídas',
-                    'data' => $despesasData,
-                    'borderColor' => '#ef4444',
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.2)',
-                    'fill' => true,
-                    'tension' => 0.3,
-                ],
-            ],
-            'labels' => $labels,
-        ];
+                'labels' => $labels,
+            ];
+        });
     }
 
     protected function getType(): string
