@@ -69,8 +69,8 @@
             <div x-show="hovered" x-cloak x-transition.opacity.duration.300ms class="absolute inset-0 p-4 bg-white dark:bg-gray-900 flex flex-col justify-center gap-y-3 overflow-y-auto">
                 <div>
                     <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        <span>Realizado: {{ number_format($data['receitas']['pct_realizada'], 0) }}%</span>
-                        <span>{{ $formatMoney($data['receitas']['pagas_mes']) }}</span>
+                        <span>Realizado: <span class="text-gray-800 dark:text-white">{{ number_format($data['receitas']['pct_realizada'], 0) }}%</span></span>
+                        <span class="text-gray-800 dark:text-white">{{ $formatMoney($data['receitas']['pagas_mes']) }}</span>
                     </div>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div class="h-2 rounded-full" style="background-color: #22c55e; width: {{ min(100, $data['receitas']['pct_realizada']) }}%"></div>
@@ -112,8 +112,8 @@
             <div x-show="hovered" x-cloak x-transition.opacity.duration.300ms class="absolute inset-0 p-4 bg-white dark:bg-gray-900 flex flex-col justify-center gap-y-3 overflow-y-auto">
                 <div>
                     <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        <span>Pagas: {{ number_format($data['despesas']['pct_paga'], 0) }}%</span>
-                        <span>{{ $formatMoney($data['despesas']['pagas_mes']) }}</span>
+                        <span>Pagas: <span class="text-gray-800 dark:text-white">{{ number_format($data['despesas']['pct_paga'], 0) }}%</span></span>
+                        <span class="text-gray-800 dark:text-white">{{ $formatMoney($data['despesas']['pagas_mes']) }}</span>
                     </div>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div class="h-2 rounded-full" style="background-color: #eab308; width: {{ min(100, $data['despesas']['pct_paga']) }}%"></div>
@@ -122,10 +122,10 @@
                 <div>
                     <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                         <span>Impacto no Faturamento</span>
-                        <span>{{ number_format($data['despesas']['impacto_faturamento'], 1, ',', '.') }}%</span>
+                        <span style="color: {{ $data['despesas']['impacto_faturamento'] < 85 ? '#22c55e' : ($data['despesas']['impacto_faturamento'] < 95 ? '#eab308' : '#ef4444') }};">{{ number_format($data['despesas']['impacto_faturamento'], 1, ',', '.') }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div class="h-2 rounded-full" style="background-color: #ef4444; width: {{ min(100, $data['despesas']['impacto_faturamento']) }}%"></div>
+                        <div class="h-2 rounded-full" style="background-color: {{ $data['despesas']['impacto_faturamento'] < 85 ? '#22c55e' : ($data['despesas']['impacto_faturamento'] < 95 ? '#eab308' : '#ef4444') }}; width: {{ min(100, $data['despesas']['impacto_faturamento']) }}%"></div>
                     </div>
                 </div>
             </div>
@@ -171,7 +171,7 @@
                         <div class="text-sm font-semibold text-gray-950 dark:text-white">{{ $data['atrasos']['tempo_medio'] }} dias</div>
                     </div>
                     <div>
-                        <div class="text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">Saldo Projetado</div>
+                        <div class="text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">Saldo Projetado (des. + rec.)</div>
                         <div class="text-sm font-semibold text-gray-950 dark:text-white" style="color: {{ $data['atrasos']['saldo_projetado'] >= 0 ? '#16a34a' : '#dc2626' }};">{{ $formatMoney($data['atrasos']['saldo_projetado']) }}</div>
                     </div>
                 </div>
