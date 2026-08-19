@@ -15,6 +15,7 @@ class RecurringTransaction extends Model
         'payment_method',
         'due_day',
         'due_month',
+        'expense_nature',
     ];
 
     public function transactions()
@@ -53,6 +54,7 @@ class RecurringTransaction extends Model
             'status' => 'pendente',
             'payment_method' => $this->payment_method,
             'recurring_transaction_id' => $this->id,
+            'expense_nature' => $this->expense_nature,
         ]);
     }
 }

@@ -18,6 +18,7 @@ class Transaction extends Model
         'status',
         'payment_method',
         'recurring_transaction_id',
+        'expense_nature',
     ];
 
     public function recurringTransaction()

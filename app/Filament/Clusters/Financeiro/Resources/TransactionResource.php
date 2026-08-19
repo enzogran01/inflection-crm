@@ -55,9 +55,16 @@ class TransactionResource extends Resource
                     ->required()
                     ->numeric()
                     ->prefix('R$')
-                    ->step('0.01')
                     ->formatStateUsing(fn ($state) => $state ? number_format($state / 100, 2, '.', '') : null)
                     ->dehydrateStateUsing(fn ($state) => $state ? (int) round((float) $state * 100) : null),
+                Forms\Components\Select::make('expense_nature')
+                    ->label('Natureza da Despesa')
+                    ->options([
+                        'fixa' => 'Fixa',
+                        'variavel' => 'Variável',
+                    ])
+                    ->visible(fn (\Filament\Forms\Get $get): bool => $get('type') === 'despesa')
+                    ->nullable(),
                 Forms\Components\DatePicker::make('due_date')
                     ->required(),
                 Forms\Components\DatePicker::make('paid_at'),
@@ -100,6 +107,10 @@ class TransactionResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('expense_nature')
+                    ->label('Natureza')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('amount')
                     ->money('BRL', 100)
                     ->sortable()
@@ -151,6 +162,12 @@ class TransactionResource extends Resource
                     ])
                     ->label('Categoria')
                     ->searchable(),
+                Tables\Filters\SelectFilter::make('expense_nature')
+                    ->options([
+                        'fixa' => 'Fixa',
+                        'variavel' => 'Variável',
+                    ])
+                    ->label('Natureza da Despesa'),
                 Tables\Filters\SelectFilter::make('payment_method')
                     ->options([
                         'credito' => 'Crédito',

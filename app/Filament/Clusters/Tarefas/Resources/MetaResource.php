@@ -8,11 +8,10 @@ use App\Filament\Clusters\Tarefas\Resources\MetaResource\RelationManagers;
 use App\Models\Meta;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MetaResource extends Resource
 {
@@ -50,6 +49,50 @@ class MetaResource extends Resource
                     ])
                     ->default('pendente')
                     ->required(),
+                Forms\Components\Select::make('categoria')
+                    ->label('Categoria')
+                    ->options([
+                        'geral' => 'Geral',
+                        'financeira' => 'Financeira',
+                    ])
+                    ->live()
+                    ->columnSpanFull(),
+                Forms\Components\Select::make('tipo_meta_financeira')
+                    ->label('Tipo de Meta Financeira')
+                    ->options([
+                        'faturamento' => 'Faturamento',
+                        'reducao_despesa' => 'Redução de Despesa',
+                        'reducao_inadimplencia' => 'Redução de Inadimplência',
+                        'margem_operacional' => 'Margem Operacional',
+                        'economia' => 'Economia',
+                        'receita' => 'Receita (Legado)',
+                        'despesa' => 'Despesa (Legado)',
+                        'lucro' => 'Lucro (Legado)',
+                    ])
+                    ->live()
+                    ->visible(fn (Get $get): bool => $get('categoria') === 'financeira'),
+                Forms\Components\TextInput::make('valor_alvo')
+                    ->label('Valor Alvo')
+                    ->numeric()
+                    ->prefix(fn (Get $get) => in_array($get('tipo_meta_financeira'), ['margem_operacional', 'reducao_inadimplencia']) ? '' : 'R$')
+                    ->suffix(fn (Get $get) => in_array($get('tipo_meta_financeira'), ['margem_operacional', 'reducao_inadimplencia']) ? '%' : '')
+                    ->maxValue(9999999999999.99)
+                    ->visible(fn (Get $get): bool => $get('categoria') === 'financeira'),
+                Forms\Components\Select::make('periodicidade')
+                    ->label('Periodicidade')
+                    ->options([
+                        'diaria' => 'Diária',
+                        'semanal' => 'Semanal',
+                        'mensal' => 'Mensal',
+                        'trimestral' => 'Trimestral',
+                        'semestral' => 'Semestral',
+                        'anual' => 'Anual',
+                    ])
+                    ->visible(fn (Get $get): bool => $get('categoria') === 'financeira'),
+                Forms\Components\DatePicker::make('data_referencia')
+                    ->label('Data de Referência')
+                    ->displayFormat('d/m/Y')
+                    ->visible(fn (Get $get): bool => $get('categoria') === 'financeira'),
             ]);
     }
 

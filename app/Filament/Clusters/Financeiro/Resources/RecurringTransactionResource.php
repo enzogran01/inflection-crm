@@ -61,6 +61,14 @@ class RecurringTransactionResource extends Resource
                     ->step('0.01')
                     ->formatStateUsing(fn ($state) => $state ? number_format($state / 100, 2, '.', '') : null)
                     ->dehydrateStateUsing(fn ($state) => $state ? (int) round((float) $state * 100) : null),
+                Forms\Components\Select::make('expense_nature')
+                    ->label('Natureza da Despesa')
+                    ->options([
+                        'fixa' => 'Fixa',
+                        'variavel' => 'Variável',
+                    ])
+                    ->visible(fn (\Filament\Forms\Get $get): bool => $get('type') === 'despesa')
+                    ->nullable(),
                 Forms\Components\Select::make('periodicity')
                     ->label('Periodicidade')
                     ->options([
@@ -125,6 +133,10 @@ class RecurringTransactionResource extends Resource
                     ->label('Categoria')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('expense_nature')
+                    ->label('Natureza')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Valor')
                     ->money('BRL', 100)

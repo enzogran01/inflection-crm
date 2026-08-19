@@ -120,12 +120,10 @@
                     </div>
                 </div>
                 <div>
-                    <div class="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    <div class="flex flex-col justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                         <span>Impacto no Faturamento</span>
                         <span style="color: {{ $data['despesas']['impacto_faturamento'] < 85 ? '#22c55e' : ($data['despesas']['impacto_faturamento'] < 95 ? '#eab308' : '#ef4444') }};">{{ number_format($data['despesas']['impacto_faturamento'], 1, ',', '.') }}%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div class="h-2 rounded-full" style="background-color: {{ $data['despesas']['impacto_faturamento'] < 85 ? '#22c55e' : ($data['despesas']['impacto_faturamento'] < 95 ? '#eab308' : '#ef4444') }}; width: {{ min(100, $data['despesas']['impacto_faturamento']) }}%"></div>
+                        <div class="text-sm font-medium h-2 rounded-full" style="background-color: {{ $data['despesas']['impacto_faturamento'] < 85 ? '#22c55e' : ($data['despesas']['impacto_faturamento'] < 95 ? '#eab308' : '#ef4444') }}; width: {{ min(100, $data['despesas']['impacto_faturamento']) }}%"></div>
                     </div>
                 </div>
             </div>
