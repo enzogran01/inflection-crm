@@ -43,20 +43,16 @@ class SaudeFinanceiraWidget extends Widget
 
         // RESULTADO E MARGEM
         $receitasMesAtual = Transaction::where('type', 'receita')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicioMesAtual, $fimMesAtual])
             ->sum('amount') / 100;
         $despesasMesAtual = Transaction::where('type', 'despesa')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicioMesAtual, $fimMesAtual])
             ->sum('amount') / 100;
 
         $receitasMesAnterior = Transaction::where('type', 'receita')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicioMesAnterior, $fimMesAnterior])
             ->sum('amount') / 100;
         $despesasMesAnterior = Transaction::where('type', 'despesa')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicioMesAnterior, $fimMesAnterior])
             ->sum('amount') / 100;
 

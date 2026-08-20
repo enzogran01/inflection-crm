@@ -177,6 +177,8 @@ class TransactionResource extends Resource
                         'boleto' => 'Boleto',
                     ])
                     ->label('Método de Pagamento'),
+                \Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter::make('due_date')
+                    ->label('Data de Vencimento'),
                 Tables\Filters\TernaryFilter::make('is_standard')
                     ->label('É recorrente?')
                     ->queries(

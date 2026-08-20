@@ -32,7 +32,7 @@ class MetaProgressoService
         
         $tipoResolvido = $mapeamentoTipos[$tipo] ?? $tipo;
 
-        return match ($tipoResolvido) {
+        $resultado = match ($tipoResolvido) {
             'faturamento' => self::calcularFaturamento($meta->valor_alvo, $inicio, $fim),
             'reducao_despesa' => self::calcularReducaoDespesa($meta->valor_alvo, $inicio, $fim),
             'reducao_inadimplencia' => self::calcularReducaoInadimplencia($meta->valor_alvo, $inicio, $fim),
@@ -40,6 +40,16 @@ class MetaProgressoService
             'economia' => self::calcularEconomia($meta->valor_alvo, $inicio, $fim),
             default => ['valor_atual' => 0, 'percentual' => 0, 'descricao' => "Tipo de meta desconhecido: {$tipo}"],
         };
+
+        if ($resultado['percentual'] >= 100 && $meta->status !== 'concluida') {
+            $meta->update(['status' => 'concluida']);
+        } elseif ($resultado['percentual'] > 0 && $resultado['percentual'] < 100 && $meta->status === 'pendente') {
+            $meta->update(['status' => 'em_andamento']);
+        } elseif ($resultado['percentual'] < 100 && $meta->status === 'concluida') {
+            $meta->update(['status' => 'em_andamento']);
+        }
+
+        return $resultado;
     }
 
     private static function calcularFaturamento(float $alvo, Carbon $inicio, Carbon $fim): array
@@ -121,12 +131,10 @@ class MetaProgressoService
     private static function calcularMargemOperacionalMeta(float $alvo, Carbon $inicio, Carbon $fim): array
     {
         $receitas = Transaction::where('type', 'receita')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicio, $fim])
             ->sum('amount');
             
         $despesas = Transaction::where('type', 'despesa')
-            ->where('status', 'pago')
             ->whereBetween('due_date', [$inicio, $fim])
             ->sum('amount');
             
