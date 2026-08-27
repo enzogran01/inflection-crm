@@ -10,7 +10,7 @@ use Filament\Widgets\Widget;
 class HealthScoreWidget extends Widget
 {
     protected static string $view = 'filament.clusters.financeiro.widgets.health-score-widget';
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
     protected static ?int $sort = 2;
 
     public function getHealthScore(): array
@@ -40,8 +40,8 @@ class HealthScoreWidget extends Widget
         $margem = FinanceiroService::calcularMargemOperacional($receitasMes, $despesasMes);
 
         // 3. Cobertura
-        $saldoAtual = (Transaction::where('type', 'receita')->where('status', 'pago')->sum('amount') 
-                     - Transaction::where('type', 'despesa')->where('status', 'pago')->sum('amount')) / 100;
+        $saldoAtual = (Transaction::where('type', 'receita')->where('status', 'pago')->sum('amount')
+            - Transaction::where('type', 'despesa')->where('status', 'pago')->sum('amount')) / 100;
         $diasPassados = max(1, Carbon::now()->day);
         $despesaMediaDiaria = $despesasMes / $diasPassados;
         $cobertura = FinanceiroService::calcularCoberturaCaixa($saldoAtual, $despesaMediaDiaria);

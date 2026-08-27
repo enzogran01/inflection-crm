@@ -30,6 +30,6 @@ class MetasSaude extends Page
 
     public function getHeaderWidgetsColumns(): int|string|array
     {
-        return 1;
+        return 2;
     }
 }

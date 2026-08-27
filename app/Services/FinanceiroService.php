@@ -140,7 +140,7 @@ class FinanceiroService
         $scoreFinal = (int) round($scoreFinal);
 
         // Nível
-        if ($scoreFinal >= 70) {
+        if ($scoreFinal >= 75) {
             $nivel = 'verde';
         } elseif ($scoreFinal >= 40) {
             $nivel = 'amarelo';
